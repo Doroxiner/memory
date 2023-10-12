@@ -1,0 +1,159 @@
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from random import *
+class vopros():
+    def __init__ (self, qustion, right, wrong1, wrong2, wrong3):
+        self.qustion = qustion
+        self.right = right
+        self.wrong1 = wrong1
+        self.wrong2 = wrong2
+        self.wrong3 = wrong3
+
+question_list = list()
+question_list.append(vopros('Какой национальности не существует?','Смурфы','Чулымцы','Алеуты','Энцы'))
+question_list.append(vopros('Назовите народ национальное блюдо которого Буузы(позы)','Буряты','Чулымцы','Алеуты','Энцы'))
+question_list.append(vopros('Самая высокая горная вершина России','Эльбрус','Дыхтау','Кукуртли-Колбаши','Ветреный Пик'))
+question_list.append(vopros('Самоназвание какого народы переводиться на русский язык как"настоящие люди"','Чукчи','Чулымцы','Алеуты','Энцы'))
+question_list.append(vopros('Какого цвета не на флаге уганды?','Зелёный','Красный','Белый','Чёрный'))
+app = QApplication([])
+
+#Вопрос
+Question = QLabel('Какой национальности не существует?')
+Buton = QPushButton('Ответить')
+#Варианты ответов
+
+RadioGroupBox = QGroupBox('Варианты ответов:')
+btn1 = QRadioButton('Энцы')
+btn2 = QRadioButton('Чулымцы')
+btn3 = QRadioButton('Смурфы')
+btn4 = QRadioButton('Алеуты')
+#Создание лайаутов 1
+line_q1 = QHBoxLayout()
+line_q2 = QVBoxLayout()
+line_q3 = QVBoxLayout()
+#Кнопки 1
+line_q2.addWidget(btn1)
+line_q2.addWidget(btn2)
+#Кнопки 2
+line_q3.addWidget(btn3)
+line_q3.addWidget(btn4)
+#Расположение лайаутов
+line_q1.addLayout(line_q2)
+line_q1.addLayout(line_q3)
+RadioGroupBox.setLayout(line_q1)
+#Создание лайаутов 2
+line_t1 = QHBoxLayout()
+line_t2 = QHBoxLayout()
+line_t3 = QHBoxLayout()
+#Привязка Виджетов
+line_t1.addWidget(Question, alignment=Qt.AlignCenter)
+line_t2.addWidget(RadioGroupBox)
+line_t3.addWidget(Buton,alignment=Qt.AlignCenter)
+#Вывод лайатов
+layout_card = QVBoxLayout()
+layout_card.addLayout(line_t1)
+layout_card.addLayout(line_t2)
+layout_card.addLayout(line_t3)
+#Результат
+Res = QLabel('Вопрос')
+Buton = QPushButton('Следуюющий вопрос')
+AnswerGroupBox = QGroupBox('Результат:')
+Correct = QLabel('Правильно/Неправильно')
+Answer = QLabel('Правильный ответ')
+
+line_res = QVBoxLayout()
+line_res.addWidget(Correct, alignment=Qt.AlignTop)
+line_res.addWidget(Answer, alignment=Qt.AlignCenter)
+AnswerGroupBox.setLayout(line_res)
+
+line_ans1 = QHBoxLayout()
+line_ans2 = QHBoxLayout()
+line_ans3 = QHBoxLayout()
+
+line_ans1.addWidget(Question, alignment=Qt.AlignCenter)
+line_ans2.addWidget(AnswerGroupBox)
+line_ans2.addWidget(RadioGroupBox)
+AnswerGroupBox.hide()
+line_ans3.addWidget(Buton)
+
+layout_card = QVBoxLayout()
+layout_card.addLayout(line_ans1)
+layout_card.addLayout(line_ans2)
+layout_card.addLayout(line_ans3)
+
+def show_resault():
+    RadioGroupBox.hide()
+    AnswerGroupBox.show()
+    Buton.setText('Следующий вопрос')
+def show_question():
+    RadioGroupBox.show()
+    AnswerGroupBox.hide()    
+    Buton.setText('Ответить')
+    RadioGroup.setExclusive(False)
+    btn1.setChecked(False)
+    btn2.setChecked(False)
+    btn3.setChecked(False)
+    btn4.setChecked(False)
+    RadioGroup.setExclusive(True)
+RadioGroup = QButtonGroup()
+RadioGroup.addButton(btn1)
+RadioGroup.addButton(btn2)
+RadioGroup.addButton(btn3)
+RadioGroup.addButton(btn4)
+Answers = [btn1,btn2,btn3,btn4]
+
+def ask(q:vopros):
+    shuffle(Answers)
+    Answers[0].setText(q.right)
+    Answers[1].setText(q.wrong1)
+    Answers[2].setText(q.wrong2)
+    Answers[3].setText(q.wrong3)
+    Question.setText(q.qustion)
+    Answer.setText(q.right)
+    show_question()
+
+def show_correct(res):
+    Correct.setText(res)
+    show_resault()
+
+def check_correct():
+    if Answers[0].isChecked():
+        show_correct('Правильно!')
+        win.right += 1
+        print('Статистика:')
+        print('Количество вопросов:',win.total)
+        print('Количество правильных ответов:', win.right)
+        print('Рейтинг:',win.right/win.total*100,'%')
+    else:
+        if Answers[1].isChecked() or Answers[2].isChecked() or Answers[3].isChecked():
+            show_correct('Неправильно!')
+            print('Статистика:')
+            print('Количество вопросов:',win.total)
+            print('Количество правильных ответов:', win.right)
+            print('Рейтинг:',win.right/win.total*100,'%')
+def next_question():
+    win.total += 1
+    print('Статистика:')
+    print('Количество вопросов:',win.total)
+    print('Количество правильных ответов:', win.right)
+    cur_question = randint(0, len(question_list)-1)
+    q =question_list[cur_question]
+    ask(q)
+
+def click():
+    if Buton.text() == 'Ответить':
+        check_correct()
+    else:
+        next_question()
+Buton.clicked.connect(click)
+
+#Создание окна
+win = QWidget()
+win.setWindowTitle('Memory Card')
+win.total = 0
+win.right = 0 
+win.setLayout(layout_card)
+next_question()
+
+win.show()
+app.exec_()
